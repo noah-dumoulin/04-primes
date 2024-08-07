@@ -3,7 +3,7 @@ import sys
 from pyairtable import Api
 
 
-def main(grade, pytest_output_string):
+def main(grade, pytest_output_string, pylint_score):
 
     print("start updating db")
 
@@ -53,6 +53,7 @@ def main(grade, pytest_output_string):
 
     data = {
     'actor' : github_actor,
+    'pylint': pylint_score,
     'grade' : grade,
     'string' : pytest_output_string,
     'sha' : github_sha,
@@ -78,4 +79,4 @@ if __name__ == "__main__":
         print("Usage: python updatedb.py grade pytest_output_string")
         sys.exit(1)
 
-    main(float(sys.argv[1]), sys.argv[2])
+    main(float(sys.argv[1]), sys.argv[2], float(sys.argv[3]))

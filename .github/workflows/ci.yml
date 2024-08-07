@@ -12,8 +12,12 @@ permissions:
 jobs:
 
   testing:
-
+  
+    if: github.actor != 'github-classroom[bot]'
     runs-on: ubuntu-latest
+    
+    outputs:
+      pylint_score: ${{ steps.pylint.outputs.pylint_score }}
 
     steps:
 
@@ -35,16 +39,20 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
+        pip install pylint pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     
-    - name: Lint with flake8
+    - name: Lint with pylint
+      id: pylint
       run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    
+        score=$(python -m pylint *.py | grep rated | awk '{print $7}' | cut -d'/' -f1)
+        if [ -z "$score" ]; then
+          echo "Failed to extract Pylint score."
+          exit 1
+        fi
+        pylint_score=$(echo "scale=2; $score / 10" | bc)
+        echo "pylint_score=$pylint_score" >> $GITHUB_OUTPUT
+
     - name: Test with pytest
       continue-on-error: true
       run: |
@@ -60,6 +68,7 @@ jobs:
 
   grading:
 
+    if: github.actor != 'github-classroom[bot]'
     runs-on: ubuntu-latest
 
     outputs:
@@ -98,13 +107,12 @@ jobs:
         echo "string=$string" >> $GITHUB_OUTPUT
 
 
-
-
   Airtable:
 
+    if: github.actor != 'github-classroom[bot]'
     runs-on: ubuntu-latest
 
-    needs: grading
+    needs: grading, testing
 
     steps:
 
@@ -136,4 +144,4 @@ jobs:
         AIRTABLE_DB_ID: ${{ secrets.AIRTABLE_DB_ID }}
         AIRTABLE_TABLE_ID : ${{ secrets.AIRTABLE_TABLE_ID }}
       run: |
-        python ./.python/updatedb.py ${{ needs.grading.outputs.grade }} ${{ needs.grading.outputs.string }}
+        python ./.python/updatedb.py ${{ needs.grading.outputs.grade }} ${{ needs.grading.outputs.string }} ${{ needs.testing.outputs.pylint_score }}
