@@ -75,8 +75,8 @@ def main(grade, pytest_output_string, pylint_score):
 
 if __name__ == "__main__":
 
-    if len(sys.argv) != 3:
-        print("Usage: python updatedb.py grade pytest_output_string")
+    if len(sys.argv) != 4:
+        print("Usage: python updatedb.py grade pytest_output_string pylint_score")
         sys.exit(1)
 
     main(float(sys.argv[1]), sys.argv[2], float(sys.argv[3]))
