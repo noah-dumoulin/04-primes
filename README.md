@@ -27,7 +27,13 @@ Le fichier ``primes.py`` contient :
 
 Si le grade n'est pas satisfaisant, répéter le cycle 1️⃣ 2️⃣ 3️⃣ 4️⃣
 
-5️⃣ Lorsque le grade est satisfaisant, pusher le travail pour évaluation
+5️⃣ Lorsque le grade est satisfaisant, s'intéresser à la [qualité du code](https://perso.esiee.fr/~courivad/python/chapters/16-style.html). Scorer cette qualité
+
+    $ pylint *.py
+
+Si le score n'est pas maximal, répéter l'étape 5️⃣ en tenant compte des messages
+
+6️⃣ Lorsque le grade et le score ``pylint`` sont satisfaisants, pusher le travail pour évaluation
 
     $ git pull
     $ git add .
